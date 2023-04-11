@@ -10,8 +10,9 @@
         android:id="@+id/barChart"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.95"
+        app:layout_constraintHeight_percent="0.6"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/xCoordinateTextView"
         app:layout_constraintStart_toEndOf="@+id/yCoordinateTextView"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -25,7 +26,6 @@
         android:layout_margin="0dp"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/barChart"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/barChart"
         app:layout_constraintEnd_toEndOf="@id/barChart" />
 
@@ -33,12 +33,12 @@
         android:id="@+id/yCoordinateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Connected persons"
-        android:padding="0dp"
         android:layout_margin="0dp"
-        android:textSize="12sp"
+        android:padding="0dp"
         android:rotation="-90"
-        app:layout_constraintTop_toTopOf="@id/barChart"
+        android:text="Connected persons"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/barChart"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

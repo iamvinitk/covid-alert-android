@@ -8,11 +8,14 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -50,6 +53,18 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private BarChart barChart;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
@@ -178,8 +193,8 @@ public class HomeFragment extends Fragment {
         barChart.getAxisRight().setEnabled(false);
 
         // Set the bar width and group spacing
-        float groupSpace = 0.4f;
-        float barSpace = 0.05f;
+        float groupSpace = 0.3f;
+        float barSpace = 0.35f;
         float barWidth = 0.25f;
         barData.setBarWidth(barWidth);
 
