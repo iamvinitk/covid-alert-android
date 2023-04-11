@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.status.StatusFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="24dp">
+
+<!--        <TextView-->
+<!--            android:id="@+id/status_status_text"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_alignParentStart="true"-->
+<!--            android:layout_alignParentTop="true"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:text="@string/status"-->
+<!--            android:textAlignment="center"-->
+<!--            android:textSize="22sp"-->
+<!--            android:textStyle="bold" />-->
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/status_upload_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/gray"
+            android:textAlignment="center">
+
+            <TextView
+                android:id="@+id/status_upload_card_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/gray"
+                android:fontFamily="sans-serif-medium"
+                android:padding="10dp"
+                android:text="Report Your Vaccination Details"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+
+            <TextView
+                android:id="@+id/status_upload_card_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="20dp"
+                android:background="@color/gray"
+                android:fontFamily="sans-serif-medium"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/status_info_text"
+                android:textColor="@color/table_heading"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/status_upload_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="160dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/custom_btn"
+                android:text="Upload Driver's Licence" />
+
+<!--            <Button-->
+<!--                android:id="@+id/status_upload_vaccination_btn"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="10dp"-->
+<!--                android:layout_marginTop="220dp"-->
+<!--                android:layout_marginEnd="10dp"-->
+<!--                android:layout_marginBottom="20dp"-->
+<!--                android:background="@drawable/custom_btn"-->
+<!--                android:text="Upload Vaccination Certificate" />-->
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/status_vaccination_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/status_upload_card"
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/gray"
+            android:visibility="gone"
+            android:textAlignment="center">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/status_vaccination_card_heading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/gray"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="4dp"
+                    android:text="Vaccination Report"
+                    android:textColor="#000000"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/status_vaccination_card_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/status_vaccination_card_heading"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="4dp"
+                    android:text="Fully Vaccinated Since 23 days"
+                    android:textColor="@color/purple_500"
+                    android:textSize="16sp" />
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:stretchColumns="*">
+
+                    <TableRow android:background="@color/table_heading">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="@string/col1"
+                            android:textColor="@color/white" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="@string/col2"
+                            android:textColor="@color/white" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="@string/col3"
+                            android:textColor="@color/white" />
+                    </TableRow>
+
+                    <!-- First row -->
+                    <TableRow>
+
+                        <TextView
+                            android:id="@+id/vaccine1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 1, Column 1" />
+
+                        <TextView
+                            android:id="@+id/product1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 1, Column 2" />
+
+                        <TextView
+                            android:id="@+id/date1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 1, Column 3" />
+                    </TableRow>
+
+                    <!-- Second row -->
+                    <TableRow>
+
+                        <TextView
+                            android:id="@+id/vaccine2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 2, Column 1" />
+
+                        <TextView
+                            android:id="@+id/product2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 2, Column 2" />
+
+                        <TextView
+                            android:id="@+id/date2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 2, Column 3" />
+                    </TableRow>
+
+                    <!-- Third row -->
+                    <TableRow>
+
+                        <TextView
+                            android:id="@+id/vaccineOther"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 3, Column 1" />
+
+                        <TextView
+                            android:id="@+id/productOther"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 3, Column 2" />
+
+                        <TextView
+                            android:id="@+id/dateOther"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/table_border"
+                            android:padding="8dp"
+                            android:text="Row 3, Column 3" />
+                    </TableRow>
+                </TableLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+</ScrollView>

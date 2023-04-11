@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Covid Alert</string>
+    <string name="title_home">Home</string>
+    <string name="title_status">Status</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="status">Status</string>
+    <string name="status_info_text">Please scan and provide a copy of your Driver\'s License and COVID vaccination card for verification purposes.</string>
+
+    <string name="notification_title" tools:ignore="ExtraTranslation">Bluetooth Scan Service</string>
+    <string name="notification_message" tools:ignore="ExtraTranslation">Scanning for nearby Bluetooth devices…</string>
+    <string name="ticker_text" tools:ignore="ExtraTranslation">Bluetooth Scan Service</string>
+    <string name="channel_description" tools:ignore="ExtraTranslation">Service to scan for Bluetooth devices in the background</string>
+    <string name="channel_name">Bluetooth Scan Service</string>
+
+    <string name="col1">Vaccine</string>
+    <string name="col2">Product Name</string>
+    <string name="col3">Date</string>
+
+</resources>
