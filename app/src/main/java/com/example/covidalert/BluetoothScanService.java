@@ -23,6 +23,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -30,19 +31,26 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 public class BluetoothScanService extends Service {
     private static final String TAG = "BluetoothScanService";
     private static final int NOTIFICATION_ID = 1;
+    public static final String BROADCAST_ACTION = "com.example.covidalert.UPDATE_UI";
+
     private static final String CHANNEL_ID = "BluetoothScanServiceChannel";
+    private static final String CHANNEL_ID_ALERT = "CovidAlertChannel";
     private BluetoothAdapter mBluetoothAdapter;
     private Handler mHandler = new Handler();
     private Runnable mPeriodicScanRunnable;
@@ -53,10 +61,12 @@ public class BluetoothScanService extends Service {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter);
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             startMyOwnForeground();
-        else
-            startForeground(NOTIFICATION_ID, getNotification());
+//        else
+//            startForeground(NOTIFICATION_ID, getNotification());
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ACTION));
+
     }
 
     @Override
@@ -127,9 +137,17 @@ public class BluetoothScanService extends Service {
                             String requestBody = jsonBody.toString();
 
                             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
-                                Log.d("RESPONSE CONTACT HISTORY", "response => " + response);
+                                Log.d("RESPONSE CONTACT HISTORY Galaxy", "response => " + response);
+                                Gson gson = new Gson();
+                                Type type = new TypeToken<Map<String, Object>>() {}.getType();
+                                Map<String, Object> contactInfo = gson.fromJson(response, type);
 
-                            }, error -> Log.d("ERROR", "error => " + error.toString())) {
+                                Intent intent1 = new Intent(BROADCAST_ACTION);
+                                String message = String.format("Contacted with %s person on %s", contactInfo.get("contactVaccineStatus"), contactInfo.get("contactDate").toString().substring(0, 10));
+                                intent1.putExtra("message", message);
+//                                getApplicationContext().sendBroadcast(intent1);
+                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
+                            }, error -> Log.d("ERROR", "")) {
                                 @Override
                                 public String getBodyContentType() {
                                     return "application/json; charset=utf-8";
@@ -219,6 +237,30 @@ public class BluetoothScanService extends Service {
             startForeground(2, notification);
         }
     }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            System.out.println("Broadcast received");
+            String message = intent.getStringExtra("message");
+            CharSequence name = "Covid Contact Alert";
+            String description = message;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_ALERT, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                    .setSmallIcon(android.R.drawable.ic_dialog_info)
+                    .setContentTitle("Covid Contact Alert")
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true);
+
+            notificationManager.notify(1, builder.build());
+        }
+    };
 }
 
 

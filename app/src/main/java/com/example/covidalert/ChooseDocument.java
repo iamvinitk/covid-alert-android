@@ -60,6 +60,7 @@ public class ChooseDocument extends AppCompatActivity {
     private Boolean isImageCaptured = false;
     private Bitmap mImageBitmap;
     private ProgressBar progressBar;
+    private Button btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +70,14 @@ public class ChooseDocument extends AppCompatActivity {
         Intent intent = getIntent();
         String docType = intent.getStringExtra("documentType");
         System.out.println("Document Type: " + docType);
+        previewImage = findViewById(R.id.choose_doc_img_preview);
         if (docType.equals("vaccine_certificate")) {
             docUploadType = "vaccine";
+            previewImage.setImageResource(R.drawable.vaccine_placeholder);
         } else {
             docUploadType = "dl";
         }
-        previewImage = findViewById(R.id.choose_doc_img_preview);
-        Button btn = findViewById(R.id.choose_doc_btn_upload);
+        btn = findViewById(R.id.choose_doc_btn_upload);
         btn.setText(String.format("Upload %s", docType.replace("_", " ").toUpperCase(Locale.ROOT)));
 
         // Progress Bar
@@ -138,6 +140,7 @@ public class ChooseDocument extends AppCompatActivity {
                             isImageCaptured = true;
                             mImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(mCurrentPhotoPath));
                             previewImage.setImageBitmap(mImageBitmap);
+                            btn.setText("Uploading...");
                             progressBar.setVisibility(ProgressBar.VISIBLE);
                             uploadImage(mImageBitmap);
                         } catch (IOException e) {
@@ -241,10 +244,10 @@ public class ChooseDocument extends AppCompatActivity {
     private void showAlert(String message, DriverDetails driverDetails) {
         progressBar.setVisibility(ProgressBar.GONE);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are the details correct?");
-        builder.setTitle(message);
+        builder.setMessage(message);
+        builder.setTitle("Are the details correct?");
         builder.setCancelable(false);
-        builder.setPositiveButton("Yes", (DialogInterface.OnClickListener) (dialog, which) -> {
+        builder.setPositiveButton("Yes", (dialog, which) -> {
             saveAndUploadDate(docUploadType, driverDetails);
             if (docUploadType.equals("vaccine")) {
                 setResult(Activity.RESULT_OK);
@@ -258,7 +261,7 @@ public class ChooseDocument extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("No", (DialogInterface.OnClickListener) (dialog, which) -> {
+        builder.setNegativeButton("No", (dialog, which) -> {
             if (docUploadType.equals("dl")) {
                 setResult(Activity.RESULT_OK);
                 finish();
