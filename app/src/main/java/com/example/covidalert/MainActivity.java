@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -19,6 +20,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.covidalert.databinding.ActivityMainBinding;
+import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;
 
@@ -52,6 +54,32 @@ public class MainActivity extends AppCompatActivity {
 //        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 //            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 //        }
+        PermissionX.init(this)
+                .permissions(Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                        Manifest.permission.FOREGROUND_SERVICE,
+                        Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.BLUETOOTH,
+                        Manifest.permission.BLUETOOTH_ADMIN,
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_ADVERTISE,
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                        Manifest.permission.POST_NOTIFICATIONS
+                ).onForwardToSettings((scope, deniedList) -> {
+                    scope.showForwardToSettingsDialog(deniedList, "You need to allow necessary permissions in Settings manually", "OK", "Cancel");
+                }).request((allGranted, grantedList, deniedList) -> {
+
+                    if (allGranted) {
+                        Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "These permissions are denied: " + deniedList, Toast.LENGTH_LONG).show();
+                    }
+
+                });
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -68,12 +96,17 @@ public class MainActivity extends AppCompatActivity {
                     android.Manifest.permission.ACCESS_FINE_LOCATION
             }, 1);
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 1);
-        } else {
-            startBluetoothScanService();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, 1);
         }
+//
+//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 1);
+//        } else {
+//            startBluetoothScanService();
+//        }
+        startBluetoothScanService();
     }
 
     private void startBluetoothScanService() {
