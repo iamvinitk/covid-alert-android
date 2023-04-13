@@ -7,38 +7,41 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- Without this folders will be inaccessible in Android-11 and above devices -->
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" /> <!-- Without this entry storage-permission entry will not be visible under app-info permissions list Android-10 and below -->
-
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29"
-        tools:ignore="ScopedStorage" />
-
-    <!--BLUETOOTH PERMISSION-->
+        tools:ignore="ScopedStorage" /> <!-- BLUETOOTH PERMISSION -->
     <!-- Request legacy Bluetooth permissions on older devices. -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <!-- Needed only if your app looks for Bluetooth devices.
+    <!--
+ Needed only if your app looks for Bluetooth devices.
              If your app doesn't use Bluetooth scan results to derive physical
              location information, you can strongly assert that your app
-             doesn't derive physical location. -->
+             doesn't derive physical location.
+    -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <!-- Needed only if your app makes the device discoverable to Bluetooth
-      devices. -->
+    <!--
+ Needed only if your app makes the device discoverable to Bluetooth
+      devices.
+    -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
-    <!-- Needed only if your app communicates with already-paired Bluetooth
-           devices. -->
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!--
+ Needed only if your app communicates with already-paired Bluetooth
+           devices.
+    -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" /> <!-- bibo01 : hardware option -->
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false" />
 
-    <!--bibo01 : hardware option-->
-    <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
-    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -51,10 +54,15 @@
         android:theme="@style/Theme.CovidAlert"
         tools:targetApi="31">
         <service
+            android:name=".BeaconService"
+            android:enabled="true"
+            android:foregroundServiceType="location"
+            android:exported="true" />
+        <service
             android:name=".BluetoothScanService"
             android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
             android:name=".VaccineEdit"

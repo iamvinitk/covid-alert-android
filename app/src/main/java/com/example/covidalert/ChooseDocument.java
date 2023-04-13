@@ -13,7 +13,6 @@ import androidx.core.content.FileProvider;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -22,6 +21,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
@@ -51,6 +52,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChooseDocument extends AppCompatActivity {
     private String mCurrentPhotoPath;
@@ -61,6 +64,9 @@ public class ChooseDocument extends AppCompatActivity {
     private Bitmap mImageBitmap;
     private ProgressBar progressBar;
     private Button btn;
+    private String advertisingId = "";
+    private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -301,63 +307,10 @@ public class ChooseDocument extends AppCompatActivity {
             editor.putString("dl_number", driverDetails.licenseNumber);
             editor.apply();
 
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-            String url = BASE_URL + "/licence";
-            AdvertisingIdClient.Info adInfo = null;
-            try {
-                adInfo = AdvertisingIdClient.getAdvertisingIdInfo(getApplicationContext());
-            } catch (Exception e) {
-                Log.e(TAG, "Error getting Advertising ID: " + e.getMessage());
-            }
+            Runnable advertisingIdRunnable = postLicence(driverDetails);
+            executorService.execute(advertisingIdRunnable);
 
-            String advertisingId = null;
-            if (adInfo != null) {
-                advertisingId = adInfo.getId();
-            } else {
-                advertisingId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-            }
-
-            try {
-                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                String macAddress = advertisingId;
-                if (bluetoothAdapter != null) {
-                    macAddress = bluetoothAdapter.getAddress();
-                }
-
-                JSONObject jsonBody = new JSONObject();
-
-                jsonBody.put("userId", advertisingId);
-                jsonBody.put("licenseNumber", driverDetails.licenseNumber);
-                jsonBody.put("deviceId", macAddress);
-                jsonBody.put("fullName", driverDetails.givenName + " " + driverDetails.familyName);
-                jsonBody.put("dateOfBirth", driverDetails.dateOfBirth);
-
-                String requestBody = jsonBody.toString();
-
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
-                    Log.d("RESPONSE", "response => " + response);
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, "Licence uploaded successfully", Toast.LENGTH_SHORT).show();
-                    });
-                }, error -> Log.d("ERROR", "error => " + error.toString())) {
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8";
-                    }
-
-                    @Override
-                    public byte[] getBody() {
-                        return requestBody.getBytes(StandardCharsets.UTF_8);
-                    }
-                };
-
-                stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-                requestQueue.add(stringRequest);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         } else if (docUploadTypeTemp.equals("vaccine")) {
             SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
             editor.putBoolean("vaccineUploaded", true);
@@ -372,60 +325,160 @@ public class ChooseDocument extends AppCompatActivity {
             editor.putString("vaccine_other_dose_manufacture", driverDetails.otherDoseManufacturer);
             editor.apply();
 
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-            String url = BASE_URL + "/vaccine";
-            AdvertisingIdClient.Info adInfo = null;
-            try {
-                adInfo = AdvertisingIdClient.getAdvertisingIdInfo(getApplicationContext());
-            } catch (Exception e) {
-                Log.e(TAG, "Error getting Advertising ID: " + e.getMessage());
-            }
-
-            String advertisingId = null;
-            if (adInfo != null) {
-                advertisingId = adInfo.getId();
-            } else {
-                advertisingId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-            }
-            try {
-                JSONObject jsonBody = new JSONObject();
-                jsonBody.put("userId", advertisingId);
-                jsonBody.put("givenName", driverDetails.givenName);
-                jsonBody.put("familyName", driverDetails.familyName);
-                jsonBody.put("dateOfBirth", driverDetails.dateOfBirth);
-                jsonBody.put("firstDoseDate", driverDetails.firstDoseDate);
-                jsonBody.put("firstDoseManufacturer", driverDetails.firstDoseManufacturer);
-                jsonBody.put("secondDoseDate", driverDetails.secondDoseDate);
-                jsonBody.put("secondDoseManufacturer", driverDetails.secondDoseManufacturer);
-                jsonBody.put("otherDoseDate", driverDetails.otherDoseDate);
-                jsonBody.put("otherDoseManufacturer", driverDetails.otherDoseManufacturer);
-
-                String requestBody = jsonBody.toString();
-
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
-                    Log.d("RESPONSE", "response => " + response);
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, "Vaccine uploaded successfully", Toast.LENGTH_SHORT).show();
-                    });
-                }, error -> Log.d("ERROR", "error => " + error.toString())) {
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8";
-                    }
-
-                    @Override
-                    public byte[] getBody() {
-                        return requestBody.getBytes(StandardCharsets.UTF_8);
-                    }
-                };
-
-                stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-                requestQueue.add(stringRequest);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Runnable advertisingIdRunnable = postVaccine(driverDetails);
+            executorService.execute(advertisingIdRunnable);
         }
+    }
+
+    private Runnable postVaccine(DriverDetails driverDetails) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                AdvertisingIdClient.Info adInfo = null;
+                try {
+                    adInfo = AdvertisingIdClient.getAdvertisingIdInfo(getApplicationContext());
+                } catch (Exception e) {
+                    Log.e("TAG", "Error getting Advertising ID: " + e.getMessage());
+                }
+
+                if (adInfo != null) {
+                    advertisingId = adInfo.getId();
+                    String adTrackingEnabled = String.valueOf(adInfo.isLimitAdTrackingEnabled());
+                    System.out.println("adTrackingEnabled: " + adTrackingEnabled);
+                    System.out.println("advertisingId: " + advertisingId);
+
+                } else {
+                    advertisingId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                }
+
+                final String finalAdvertisingId = advertisingId;
+                mainThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+                        String url = BASE_URL + "/vaccine";
+
+                        try {
+                            JSONObject jsonBody = new JSONObject();
+                            jsonBody.put("userId", finalAdvertisingId);
+                            jsonBody.put("givenName", driverDetails.givenName);
+                            jsonBody.put("familyName", driverDetails.familyName);
+                            jsonBody.put("dateOfBirth", driverDetails.dateOfBirth);
+                            jsonBody.put("firstDoseDate", driverDetails.firstDoseDate);
+                            jsonBody.put("firstDoseManufacturer", driverDetails.firstDoseManufacturer);
+                            jsonBody.put("secondDoseDate", driverDetails.secondDoseDate);
+                            jsonBody.put("secondDoseManufacturer", driverDetails.secondDoseManufacturer);
+                            jsonBody.put("otherDoseDate", driverDetails.otherDoseDate);
+                            jsonBody.put("otherDoseManufacturer", driverDetails.otherDoseManufacturer);
+
+                            String requestBody = jsonBody.toString();
+
+                            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
+                                Log.d("RESPONSE", "response => " + response);
+                                runOnUiThread(() -> {
+                                    Toast.makeText(getApplicationContext(), "Vaccine uploaded successfully", Toast.LENGTH_SHORT).show();
+                                });
+                            }, error -> {
+                                Log.d("ERROR", "error => " + error.toString());
+                                runOnUiThread(() -> {
+                                    Toast.makeText(getApplicationContext(), "Vaccine upload failed. Try again", Toast.LENGTH_SHORT).show();
+                                });
+                            }) {
+                                @Override
+                                public String getBodyContentType() {
+                                    return "application/json; charset=utf-8";
+                                }
+
+                                @Override
+                                public byte[] getBody() {
+                                    return requestBody.getBytes(StandardCharsets.UTF_8);
+                                }
+                            };
+
+                            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+                            requestQueue.add(stringRequest);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        };
+    }
+
+    private Runnable postLicence(DriverDetails driverDetails) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                AdvertisingIdClient.Info adInfo = null;
+                try {
+                    adInfo = AdvertisingIdClient.getAdvertisingIdInfo(getApplicationContext());
+                } catch (Exception e) {
+                    Log.e("TAG", "Error getting Advertising ID: " + e.getMessage());
+                }
+
+                if (adInfo != null) {
+                    advertisingId = adInfo.getId();
+                    String adTrackingEnabled = String.valueOf(adInfo.isLimitAdTrackingEnabled());
+                    System.out.println("adTrackingEnabled: " + adTrackingEnabled);
+                    System.out.println("advertisingId: " + advertisingId);
+
+                } else {
+                    advertisingId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                }
+
+                final String finalAdvertisingId = advertisingId;
+                mainThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+                        String url = BASE_URL + "/licence";
+
+                        try {
+                            JSONObject jsonBody = new JSONObject();
+
+                            jsonBody.put("userId", finalAdvertisingId);
+                            jsonBody.put("licenseNumber", driverDetails.licenseNumber);
+                            jsonBody.put("deviceId", finalAdvertisingId);
+                            jsonBody.put("fullName", driverDetails.givenName + " " + driverDetails.familyName);
+                            jsonBody.put("dateOfBirth", driverDetails.dateOfBirth);
+
+                            String requestBody = jsonBody.toString();
+
+                            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
+                                Log.d("RESPONSE", "response => " + response);
+                                runOnUiThread(() -> {
+                                    Toast.makeText(getApplicationContext(), "Licence uploaded successfully", Toast.LENGTH_SHORT).show();
+                                });
+                            }, error -> {
+                                Log.d("ERROR", "error => " + error.toString());
+                                runOnUiThread(() -> {
+                                    Toast.makeText(getApplicationContext(), "Error Uploading Licence. Try Again", Toast.LENGTH_SHORT).show();
+                                });
+                            }) {
+                                @Override
+                                public String getBodyContentType() {
+                                    return "application/json; charset=utf-8";
+                                }
+
+                                @Override
+                                public byte[] getBody() {
+                                    return requestBody.getBytes(StandardCharsets.UTF_8);
+                                }
+                            };
+
+                            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+                            requestQueue.add(stringRequest);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        };
     }
 }
