@@ -1,85 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:fillViewport="true"
     android:isScrollContainer="true"
     android:paddingBottom="8dp"
     tools:ignore="UselessParent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.home.HomeFragment">
-
-
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/barChart"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.6"
-            app:layout_constraintStart_toEndOf="@+id/yCoordinateTextView"
-            app:layout_constraintTop_toBottomOf="@id/filterButton"
-            app:layout_constraintWidth_percent="0.95" />
-
-        <TextView
-            android:id="@+id/xCoordinateTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="0dp"
-            android:layout_marginTop="8dp"
-            android:padding="0dp"
-            android:text="Last 7 days"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@id/barChart"
-            app:layout_constraintStart_toStartOf="@id/barChart"
-            app:layout_constraintTop_toBottomOf="@id/barChart" />
-
-        <TextView
-            android:id="@+id/yCoordinateTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="0dp"
-            android:padding="0dp"
-            android:rotation="-90"
-            android:text="Connected persons"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@id/barChart"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/filterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@color/white"
-            android:src="@drawable/ic_filter"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="420dp"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/xCoordinateTextView">
+            android:weightSum="100"
+            tools:context=".ui.home.HomeFragment">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/filterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_marginTop="48dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_weight="5"
+                android:background="@color/white"
+                android:contentDescription="@string/app_name"
+                android:elevation="6dp"
+                android:padding="16dp"
+                android:src="@drawable/ic_filter" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <com.example.covidalert.VerticalTextView
+                    android:id="@+id/yCoordinateTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0.05"
+                    android:text="Connected persons"
+                    android:textSize="12sp" />
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/barChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".95" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <TextView
+                android:id="@+id/xCoordinateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="5"
+                android:padding="0dp"
+                android:text="Last 7 days"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="center"
                 android:text="Reports"
+                android:textAlignment="center"
                 android:textColor="@color/purple_500"
-                android:textSize="28sp"
-                />
+                android:textSize="28sp" />
 
             <Button
                 android:id="@+id/applyButton"
@@ -95,12 +102,12 @@
                 android:id="@+id/home_no_notifications"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No new notifications"
-                android:textColor="@android:color/black"
-                android:textSize="18sp"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:text="No new notifications"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -109,6 +116,5 @@
                 tools:listitem="@layout/notification_item" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </ScrollView>
