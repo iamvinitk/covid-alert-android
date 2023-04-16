@@ -134,7 +134,7 @@ public class BeaconService extends Service implements BeaconConsumer {
                                 String requestBody = jsonBody.toString();
                                 final int[] statusCode = {0};
                                 StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
-                                    if (statusCode[0] == = 201) {
+                                    if (statusCode[0] == 201) {
                                         // Response Code
                                         Log.d("RESPONSE CONTACT HISTORY Galaxy", "response => " + response);
                                         Gson gson = new Gson();
