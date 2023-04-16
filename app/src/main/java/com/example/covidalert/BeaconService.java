@@ -31,8 +31,10 @@ import java.util.concurrent.Executors;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -58,6 +60,7 @@ public class BeaconService extends Service implements BeaconConsumer {
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private String advertisingId = "";
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -121,7 +124,7 @@ public class BeaconService extends Service implements BeaconConsumer {
 
                                 JSONObject jsonBody = new JSONObject();
                                 LocalDate currentDate = LocalDate.now();
-                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                 String formattedDate = currentDate.format(formatter);
                                 jsonBody.put("userId", advertisingId);
                                 jsonBody.put("licenseNumber", licenceNumber);
@@ -129,32 +132,34 @@ public class BeaconService extends Service implements BeaconConsumer {
                                 jsonBody.put("contactDeviceId", contactDeviceId);
 
                                 String requestBody = jsonBody.toString();
-
+                                final int[] statusCode = {0};
                                 StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
-                                    // Response Code
-                                    Log.d("RESPONSE CONTACT HISTORY Galaxy", "response => " + response);
-                                    Gson gson = new Gson();
-                                    Type type = new TypeToken<Map<String, Object>>() {}.getType();
-                                    Map<String, Object> contactInfo = gson.fromJson(response, type);
+                                    if (statusCode[0] == = 201) {
+                                        // Response Code
+                                        Log.d("RESPONSE CONTACT HISTORY Galaxy", "response => " + response);
+                                        Gson gson = new Gson();
+                                        Type type = new TypeToken<Map<String, Object>>() {
+                                        }.getType();
+                                        Map<String, Object> contactInfo = gson.fromJson(response, type);
 
-                                    String message = String.format("Contacted with %s person on %s", contactInfo.get("contactVaccineStatus"), contactInfo.get("contactDate").toString().substring(0, 10));
-                                    CharSequence name = "Covid Contact Alert";
-                                    String description = message;
-                                    int importance = NotificationManager.IMPORTANCE_DEFAULT;
-                                    NotificationChannel channel = new NotificationChannel("CovidAlertChannel", name, importance);
-                                    channel.setDescription(description);
-                                    NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                                    notificationManager.createNotificationChannel(channel);
+                                        String message = String.format("Contacted with %s person on %s", contactInfo.get("contactVaccineStatus"), contactInfo.get("contactDate").toString().substring(0, 10));
+                                        CharSequence name = "Covid Contact Alert";
+                                        String description = message;
+                                        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                                        NotificationChannel channel = new NotificationChannel("CovidAlertChannel", name, importance);
+                                        channel.setDescription(description);
+                                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                                        notificationManager.createNotificationChannel(channel);
 
-                                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                                            .setSmallIcon(android.R.drawable.ic_dialog_info)
-                                            .setContentTitle("Covid Contact Alert")
-                                            .setContentText(message)
-                                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                            .setAutoCancel(true);
+                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                                                .setContentTitle("Covid Contact Alert")
+                                                .setContentText(message)
+                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                                .setAutoCancel(true);
 
-                                    notificationManager.notify(1, builder.build());
-
+                                        notificationManager.notify(1, builder.build());
+                                    }
                                 }, error -> Log.d("ERROR", "")) {
                                     @Override
                                     public String getBodyContentType() {
@@ -164,6 +169,12 @@ public class BeaconService extends Service implements BeaconConsumer {
                                     @Override
                                     public byte[] getBody() {
                                         return requestBody.getBytes(StandardCharsets.UTF_8);
+                                    }
+
+                                    @Override
+                                    public Response<String> parseNetworkResponse(NetworkResponse networkResponse) {
+                                        statusCode[0] = networkResponse.statusCode;
+                                        return super.parseNetworkResponse(networkResponse);
                                     }
                                 };
 
