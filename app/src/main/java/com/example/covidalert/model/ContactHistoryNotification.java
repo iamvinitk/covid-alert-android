@@ -88,4 +88,13 @@ public class ContactHistoryNotification {
         else
             return "Unknown";
     }
+
+    public void setContactDate(String contactDate) {
+        this.contactDate = contactDate;
+    }
+
+    public String getContactTime() {
+        // Return time in format: 2021-04-16T00:00:00.000Z
+        return contactDate.substring(11, 19);
+    }
 }

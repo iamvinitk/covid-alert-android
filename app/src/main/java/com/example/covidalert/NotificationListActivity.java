@@ -5,6 +5,7 @@ import static java.security.AccessController.getContext;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -56,8 +57,10 @@ public class NotificationListActivity extends AppCompatActivity {
         textView = findViewById(R.id.text_view_no_notifications);
 
         // Initialize adapter and set it to RecyclerView
-        mAdapter = new NotificationAdapter(notifications);
+        mAdapter = new NotificationAdapter(notifications, 0);
         recyclerView.setAdapter(mAdapter);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),1);
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         SharedPreferences sharedPreferences = Objects.requireNonNull(this).getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 

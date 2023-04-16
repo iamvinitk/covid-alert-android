@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -133,9 +134,11 @@ public class HomeFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         // Initialize adapter and set it to RecyclerView
-        mAdapter = new NotificationAdapter(reportList);
+        mAdapter = new NotificationAdapter(reportList, 1);
         recyclerView.setAdapter(mAdapter);
 
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),1);
+        recyclerView.addItemDecoration(dividerItemDecoration);
         return root;
     }
 

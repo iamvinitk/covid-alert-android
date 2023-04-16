@@ -13,16 +13,17 @@ import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationViewHolder> {
     private List<ContactHistoryNotification> notifications;
-
-    public NotificationAdapter(List<ContactHistoryNotification> notifications) {
+    private int layoutId;
+    public NotificationAdapter(List<ContactHistoryNotification> notifications, int layoutId) {
         this.notifications = notifications;
+        this.layoutId = layoutId;
     }
 
     @NonNull
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_item, parent, false);
-        return new NotificationViewHolder(view);
+        return new NotificationViewHolder(view, layoutId);
     }
 
     @Override
