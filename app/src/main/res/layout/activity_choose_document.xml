@@ -22,10 +22,10 @@
         android:id="@+id/choose_doc_btn_upload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/choose_doc_img_preview"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="85dp"
+        android:layout_below="@id/choose_doc_progress_bar"
         android:layout_marginTop="19dp"
         android:layout_marginEnd="79dp"
         android:background="@drawable/custom_btn"
@@ -35,7 +35,8 @@
         android:id="@+id/choose_doc_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:visibility="gone" />
+        android:layout_centerInParent="true"
+        android:layout_below="@id/choose_doc_img_preview"
+        android:visibility="visible" />
 </RelativeLayout>

@@ -1,100 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".LicenceEdit">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_above="@+id/licence_edit_placeholder"
-        android:layout_alignParentStart="true"
-        android:textColor="@color/purple_500"
-        android:layout_marginTop="16dp"
-        android:text="Driving Licence Details"
-        android:textAlignment="center"
-        android:textSize="28sp" />
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:isScrollContainer="true"
+        tools:ignore="UselessParent">
 
-    <ImageView
-        android:id="@+id/licence_edit_placeholder"
-        android:layout_width="match_parent"
-        android:layout_height="175dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:paddingHorizontal="20dp"
-        android:layout_marginHorizontal="16dp"
-        android:src="@drawable/driver_licence_placeholder" />
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:context=".LicenceEdit">
 
-    <TextView
-        android:layout_above="@+id/licence_edit_licence_number_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
-        android:text="Licence Number" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_above="@+id/licence_edit_placeholder"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="16dp"
+                android:text="Driving Licence Details"
+                android:textAlignment="center"
+                android:textColor="@color/purple_500"
+                android:textSize="28sp" />
 
-    <EditText
-        android:id="@+id/licence_edit_licence_number"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="16dp"
-        android:hint="Licence Number" />
+            <ImageView
+                android:id="@+id/licence_edit_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="175dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginHorizontal="16dp"
+                android:paddingHorizontal="20dp"
+                android:src="@drawable/driver_licence_placeholder" />
 
-    <TextView
-        android:layout_above="@+id/licence_edit_licence_name_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
-        android:text="Licence Name" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/licence_edit_licence_number_text"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:text="Licence Number" />
 
-    <EditText
-        android:id="@+id/licence_edit_licence_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="16dp"
-        android:hint="Name" />
+            <EditText
+                android:id="@+id/licence_edit_licence_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:hint="Licence Number" />
 
-    <TextView
-        android:layout_above="@+id/licence_edit_licence_dob_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
-        android:text="Licence DOB" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/licence_edit_licence_name_text"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:text="Licence Name" />
 
-    <EditText
-        android:id="@+id/licence_edit_licence_dob"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="16dp"
-        android:hint="1995-06-06" />
+            <EditText
+                android:id="@+id/licence_edit_licence_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:hint="Name" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/licence_edit_licence_dob_text"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:text="Licence DOB" />
+
+            <EditText
+                android:id="@+id/licence_edit_licence_dob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:hint="1995-06-06" />
 
 
-    <Button
-        android:id="@+id/licence_edit_submit_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/custom_btn"
-        android:text="Submit Data" />
+            <Button
+                android:id="@+id/licence_edit_submit_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/custom_btn"
+                android:text="Submit Data" />
 
 
-
-
-</androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </ScrollView>
+</RelativeLayout>

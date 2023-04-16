@@ -2,7 +2,10 @@ package com.example.covidalert.ui.home;
 
 import static com.example.covidalert.Constants.BASE_URL;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,8 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +31,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.covidalert.NotificationListActivity;
 import com.example.covidalert.R;
 import com.example.covidalert.databinding.FragmentHomeBinding;
 import com.example.covidalert.model.ContactHistory;
@@ -37,6 +45,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
@@ -54,6 +63,12 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private BarChart barChart;
 
+    private FloatingActionButton filterButton;
+    private Calendar startDate;
+    private Calendar endDate;
+    private String startDateString;
+    private String endDateString;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,33 +81,31 @@ public class HomeFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_icon) {
+            startActivity(new Intent(getActivity(), NotificationListActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         barChart = root.findViewById(R.id.barChart);
-        SharedPreferences sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
-        String licenceNumber = sharedPreferences.getString("dl_number", null);
+        filterButton = root.findViewById(R.id.filterButton);
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showStartDatePickerDialog();
+            }
+        });
 
-        String url = BASE_URL + "/contactHistory/" + licenceNumber;
-        System.out.println("URL: " + url);
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
-            Log.d("RESPONSE", "response => " + response);
-            getActivity().runOnUiThread(() -> {
-                updateGraph(response);
-            });
-        }, error -> Log.d("ERROR", "error => " + error.toString())) {
-
-        };
-
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        requestQueue.add(stringRequest);
-
-
+        getData(null, null);
         return root;
     }
 
@@ -202,5 +215,95 @@ public class HomeFragment extends Fragment {
         barChart.setData(barData);
         barChart.groupBars(0f, groupSpace, barSpace);
         barChart.invalidate();
+    }
+
+    private void showStartDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        startDate = Calendar.getInstance();
+                        startDate.set(year, month, dayOfMonth);
+                        startDateString = year + "-" + (month + 1) + "-" + dayOfMonth;
+                        showEndDatePickerDialog();
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+        datePickerDialog.setTitle("Select Start Date");
+        datePickerDialog.show();
+    }
+
+    private void showEndDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        endDate = Calendar.getInstance();
+                        endDate.set(year, month, dayOfMonth);
+                        endDateString = year + "-" + (month + 1) + "-" + dayOfMonth;
+//                        updateBarChartData();
+                        System.out.println("Start Date: " + startDateString);
+                        System.out.println("End Date: " + endDateString);
+                        getData(startDateString, endDateString);
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+        datePickerDialog.setTitle("Select End Date");
+
+        datePickerDialog.show();
+    }
+
+    private void getData(String startDate, String endDate) {
+        if(startDate == null && endDate == null) {
+            SharedPreferences sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+            String licenceNumber = sharedPreferences.getString("dl_number", null);
+
+            String url = BASE_URL + "/contactHistory/" + licenceNumber;
+            System.out.println("URL: " + url);
+            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
+                Log.d("RESPONSE", "response => " + response);
+                getActivity().runOnUiThread(() -> {
+                    updateGraph(response);
+                });
+            }, error -> Log.d("ERROR", "error => " + error.toString())) {
+
+            };
+
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            requestQueue.add(stringRequest);
+        } else {
+            SharedPreferences sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+            String licenceNumber = sharedPreferences.getString("dl_number", null);
+
+            String url = BASE_URL + "/contactHistory/" + licenceNumber + "?startDate=" + startDate + "&endDate=" + endDate;
+            System.out.println("URL: " + url);
+            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
+                Log.d("RESPONSE", "response => " + response);
+                getActivity().runOnUiThread(() -> {
+                    updateGraph(response);
+                });
+            }, error -> Log.d("ERROR", "error => " + error.toString())) {
+
+            };
+
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            requestQueue.add(stringRequest);
+        }
     }
 }

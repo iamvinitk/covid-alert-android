@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
@@ -27,10 +29,15 @@ import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class VaccineEdit extends AppCompatActivity {
 
     private final String TAG = "VaccineEdit";
+    private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private String advertisingId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,58 +102,8 @@ public class VaccineEdit extends AppCompatActivity {
             editor.putString("vaccine_other_dose_manufacture", updatedOtherDoseManufacturer);
             editor.apply();
 
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-            String url = BASE_URL + "/vaccine";
-            AdvertisingIdClient.Info adInfo = null;
-            try {
-                adInfo = AdvertisingIdClient.getAdvertisingIdInfo(getApplicationContext());
-            } catch (Exception e) {
-                Log.e(TAG, "Error getting Advertising ID: " + e.getMessage());
-            }
-
-            String advertisingId = null;
-            if (adInfo != null) {
-                advertisingId = adInfo.getId();
-            } else {
-                advertisingId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-            }
-            try {
-                JSONObject jsonBody = new JSONObject();
-                jsonBody.put("userId", advertisingId);
-                jsonBody.put("givenName", updatedFirstName);
-                jsonBody.put("familyName", updatedLastName);
-                jsonBody.put("dateOfBirth", updatedDob);
-                jsonBody.put("firstDoseDate", updatedFirstDoseDate);
-                jsonBody.put("firstDoseManufacturer", updatedFirstDoseManufacturer);
-                jsonBody.put("secondDoseDate", updatedSecondDoseDate);
-                jsonBody.put("secondDoseManufacturer", updatedSecondDoseManufacturer);
-                jsonBody.put("otherDoseDate", updatedOtherDoseDate);
-                jsonBody.put("otherDoseManufacturer", updatedOtherDoseManufacturer);
-
-                String requestBody = jsonBody.toString();
-
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
-                    Log.d("RESPONSE", "response => " + response);
-                    runOnUiThread(this::gotoMainActivity);
-                }, error -> Log.d("ERROR", "error => " + error.toString())) {
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8";
-                    }
-
-                    @Override
-                    public byte[] getBody() {
-                        return requestBody.getBytes(StandardCharsets.UTF_8);
-                    }
-                };
-
-                stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-                requestQueue.add(stringRequest);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            DriverDetails driverDetails = new DriverDetails(updatedFirstName, updatedLastName, updatedDob, "", updatedFirstDoseDate, updatedFirstDoseManufacturer, updatedSecondDoseDate, updatedSecondDoseManufacturer, updatedOtherDoseDate, updatedOtherDoseManufacturer);
+            executorService.execute(postVaccine(driverDetails));
         });
     }
 
@@ -156,5 +113,81 @@ public class VaccineEdit extends AppCompatActivity {
         finish();
 //        Intent intent = new Intent(this, MainActivity.class);
 //        startActivity(intent);
+    }
+
+    private Runnable postVaccine(DriverDetails driverDetails) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                AdvertisingIdClient.Info adInfo = null;
+                try {
+                    adInfo = AdvertisingIdClient.getAdvertisingIdInfo(getApplicationContext());
+                } catch (Exception e) {
+                    Log.e("TAG", "Error getting Advertising ID: " + e.getMessage());
+                }
+
+                if (adInfo != null) {
+                    advertisingId = adInfo.getId();
+                    String adTrackingEnabled = String.valueOf(adInfo.isLimitAdTrackingEnabled());
+                    System.out.println("adTrackingEnabled: " + adTrackingEnabled);
+                    System.out.println("advertisingId: " + advertisingId);
+
+                } else {
+                    advertisingId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                }
+
+                final String finalAdvertisingId = advertisingId;
+                mainThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+                        String url = BASE_URL + "/vaccine";
+
+                        try {
+                            JSONObject jsonBody = new JSONObject();
+                            jsonBody.put("userId", finalAdvertisingId);
+                            jsonBody.put("givenName", driverDetails.givenName);
+                            jsonBody.put("familyName", driverDetails.familyName);
+                            jsonBody.put("dateOfBirth", driverDetails.dateOfBirth);
+                            jsonBody.put("firstDoseDate", driverDetails.firstDoseDate);
+                            jsonBody.put("firstDoseManufacturer", driverDetails.firstDoseManufacturer);
+                            jsonBody.put("secondDoseDate", driverDetails.secondDoseDate);
+                            jsonBody.put("secondDoseManufacturer", driverDetails.secondDoseManufacturer);
+                            jsonBody.put("otherDoseDate", driverDetails.otherDoseDate);
+                            jsonBody.put("otherDoseManufacturer", driverDetails.otherDoseManufacturer);
+
+                            String requestBody = jsonBody.toString();
+
+                            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
+                                Log.d("RESPONSE", "response => " + response);
+                                runOnUiThread(VaccineEdit.this::gotoMainActivity);
+                            }, error -> {
+                                Log.d("ERROR", "error => " + error.toString());
+                                runOnUiThread(() -> {
+                                    Toast.makeText(getApplicationContext(), "Vaccine upload failed. Try again", Toast.LENGTH_SHORT).show();
+                                });
+                            }) {
+                                @Override
+                                public String getBodyContentType() {
+                                    return "application/json; charset=utf-8";
+                                }
+
+                                @Override
+                                public byte[] getBody() {
+                                    return requestBody.getBytes(StandardCharsets.UTF_8);
+                                }
+                            };
+
+                            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+                            requestQueue.add(stringRequest);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        };
     }
 }

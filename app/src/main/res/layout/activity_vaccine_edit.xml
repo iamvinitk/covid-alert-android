@@ -1,205 +1,250 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:isScrollContainer="true"
+    android:fitsSystemWindows="true"
     tools:context=".VaccineEdit">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:isScrollContainer="true"
+        tools:ignore="UselessParent">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="16dp"
-            android:text="Vaccine Details"
-            android:textAlignment="center"
-            android:textColor="@color/purple_500"
-            android:textSize="28sp" />
-
-        <TextView
-            android:layout_above="@+id/vaccine_edit_given_name_text"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Given Name" />
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/vaccine_edit_given_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="John" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="16dp"
+                android:text="Vaccine Details"
+                android:textAlignment="center"
+                android:textColor="@color/purple_500"
+                android:textSize="28sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/vaccine_edit_family_name_text"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Family Name" />
+            <TextView
+                android:id="@+id/vaccine_edit_given_name_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="Given Name" />
 
-        <EditText
-            android:id="@+id/vaccine_edit_family_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="Doe" />
+            <EditText
+                android:id="@+id/vaccine_edit_given_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="John" />
 
-        <TextView
-            android:layout_above="@+id/vaccine_edit_dob_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="DOB" />
+            <TextView
+                android:id="@+id/vaccine_edit_family_name_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="Family Name" />
 
-        <EditText
-            android:id="@+id/vaccine_edit_dob"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="1995-06-06" />
+            <EditText
+                android:id="@+id/vaccine_edit_family_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="Doe" />
 
-        <!--#################################### First Dose ####################################-->
+            <TextView
+                android:id="@+id/vaccine_edit_dob_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="DOB" />
 
-        <TextView
-            android:layout_above="@+id/vaccine_edit_first_dose_manufacturer_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="First Dose Manufacturer" />
+            <EditText
+                android:id="@+id/vaccine_edit_dob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="1995-06-06" />
 
-        <EditText
-            android:id="@+id/vaccine_edit_first_dose_manufacturer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="Pfizer" />
+            <!--#################################### First Dose ####################################-->
 
-        <TextView
-            android:layout_above="@+id/vaccine_edit_first_dose_date_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="First Dose Date" />
+            <TextView
+                android:id="@+id/vaccine_edit_first_dose_manufacturer_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="First Dose Manufacturer" />
 
-        <EditText
-            android:id="@+id/vaccine_edit_first_dose_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="2023-03-03" />
+            <EditText
+                android:id="@+id/vaccine_edit_first_dose_manufacturer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="Pfizer" />
 
-        <!--#################################### Second Dose ####################################-->
+            <TextView
+                android:id="@+id/vaccine_edit_first_dose_date_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="First Dose Date" />
 
-        <TextView
-            android:layout_above="@+id/vaccine_edit_second_dose_manufacturer_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Second Dose Manufacturer" />
+            <EditText
+                android:id="@+id/vaccine_edit_first_dose_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="2023-03-03" />
 
-        <EditText
-            android:id="@+id/vaccine_edit_second_dose_manufacturer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="Pfizer" />
+            <!--#################################### Second Dose ####################################-->
 
-        <TextView
-            android:layout_above="@+id/vaccine_edit_second_dose_date_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Second Dose Date" />
+            <TextView
+                android:id="@+id/vaccine_edit_second_dose_manufacturer_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="Second Dose Manufacturer" />
 
-        <EditText
-            android:id="@+id/vaccine_edit_second_dose_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="2023-03-03" />
+            <EditText
+                android:id="@+id/vaccine_edit_second_dose_manufacturer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="Pfizer" />
 
-        <!--#################################### Other Dose ####################################-->
+            <TextView
+                android:id="@+id/vaccine_edit_second_dose_date_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="Second Dose Date" />
 
-        <TextView
-            android:layout_above="@+id/vaccine_edit_other_dose_manufacturer_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Other Dose Manufacturer" />
+            <EditText
+                android:id="@+id/vaccine_edit_second_dose_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="2023-03-03" />
 
-        <EditText
-            android:id="@+id/vaccine_edit_other_dose_manufacturer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="Pfizer" />
+            <!--#################################### Other Dose ####################################-->
 
-        <TextView
-            android:layout_above="@+id/vaccine_edit_other_dose_date_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Other Dose Date" />
+            <TextView
+                android:id="@+id/vaccine_edit_other_dose_manufacturer_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="Other Dose Manufacturer" />
 
-        <EditText
-            android:id="@+id/vaccine_edit_other_dose_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:hint="2023-03-03" />
+            <EditText
+                android:id="@+id/vaccine_edit_other_dose_manufacturer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="Pfizer" />
 
-        <Button
-            android:id="@+id/vaccine_edit_submit_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/custom_btn"
-            android:text="Submit Data" />
+            <TextView
+                android:id="@+id/vaccine_edit_other_dose_date_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="Other Dose Date" />
+
+            <EditText
+                android:id="@+id/vaccine_edit_other_dose_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:hint="2023-03-03" />
+
+            <Button
+                android:id="@+id/vaccine_edit_submit_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:padding="16dp"
+                android:background="@drawable/custom_btn"
+                android:text="Submit Data" />
 
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</ScrollView>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </ScrollView>
+</RelativeLayout>
