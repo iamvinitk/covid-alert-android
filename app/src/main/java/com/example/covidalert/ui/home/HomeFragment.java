@@ -3,7 +3,6 @@ package com.example.covidalert.ui.home;
 import static com.example.covidalert.Constants.BASE_URL;
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,26 +17,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.covidalert.NotificationAdapter;
 import com.example.covidalert.NotificationListActivity;
 import com.example.covidalert.R;
 import com.example.covidalert.databinding.FragmentHomeBinding;
-import com.example.covidalert.model.ContactHistory;
+import com.example.covidalert.model.ContactHistoryNotification;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -52,6 +52,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -68,6 +69,15 @@ public class HomeFragment extends Fragment {
     private Calendar endDate;
     private String startDateString;
     private String endDateString;
+
+    private String reportDateString;
+    private Button applyButton;
+    private Calendar reportCalendar;
+
+    private ArrayList<ContactHistoryNotification> reportList;
+    private NotificationAdapter mAdapter;
+    private RecyclerView recyclerView;
+    private TextView textView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,6 +107,14 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
         barChart = root.findViewById(R.id.barChart);
 
+        applyButton = root.findViewById(R.id.applyButton);
+        applyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showReportDatePickerDialog();
+            }
+        });
+
         filterButton = root.findViewById(R.id.filterButton);
         filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +124,18 @@ public class HomeFragment extends Fragment {
         });
 
         getData(null, null);
+
+        // Report
+        reportList = new ArrayList<>();
+        textView = root.findViewById(R.id.home_no_notifications);
+        recyclerView = root.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+
+        // Initialize adapter and set it to RecyclerView
+        mAdapter = new NotificationAdapter(reportList);
+        recyclerView.setAdapter(mAdapter);
+
         return root;
     }
 
@@ -304,6 +334,73 @@ public class HomeFragment extends Fragment {
             stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
             requestQueue.add(stringRequest);
+        }
+    }
+
+    private void showReportDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        reportCalendar = Calendar.getInstance();
+                        reportCalendar.set(year, month, dayOfMonth);
+                        reportDateString = year + "-" + (month + 1) + "-" + dayOfMonth;
+                        // Update the recyclerview
+                        System.out.println("Report Date: " + reportDateString);
+                        updateReports();
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+        datePickerDialog.setTitle("Select Report Date");
+        datePickerDialog.show();
+    }
+
+    private void updateReports(){
+        SharedPreferences sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+        String licenceNumber = sharedPreferences.getString("dl_number", null);
+
+        String url = BASE_URL + "/contactHistory/notifications/" + licenceNumber + "?date=" + reportDateString;
+        System.out.println("URL: " + url);
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
+            Log.d("RESPONSE", "response => " + response);
+            Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                Gson gson = new Gson();
+                ContactHistoryNotification[] newNotifications = gson.fromJson(response, ContactHistoryNotification[].class);
+
+                reportList.clear();
+                // add the new notifications
+                reportList.addAll(Arrays.asList(newNotifications));
+                // notify the adapter
+                if (reportList.size() == 0) {
+                    textView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                } else {
+                    textView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+                mAdapter.notifyDataSetChanged();
+            });
+        }, error -> Log.d("ERROR", "error => " + error.toString())) {
+
+        };
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        requestQueue.add(stringRequest);
+
+        if (reportList.size() == 0) {
+            textView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            textView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
         }
     }
 }

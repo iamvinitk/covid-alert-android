@@ -101,49 +101,5 @@ public class NotificationListActivity extends AppCompatActivity {
             recyclerView.setVisibility(View.VISIBLE);
         }
     }
-
-    public class NotificationViewHolder extends RecyclerView.ViewHolder {
-        private TextView contactDate;
-        private TextView contactTimeElapsed;
-        private TextView contactVaccineStatus;
-
-        public NotificationViewHolder(@NonNull View itemView) {
-            super(itemView);
-            contactDate = itemView.findViewById(R.id.notification_date);
-            contactTimeElapsed = itemView.findViewById(R.id.notification_time_elapsed);
-            contactVaccineStatus = itemView.findViewById(R.id.notification_status_value);
-        }
-
-        public void bind(ContactHistoryNotification notification) {
-            contactDate.setText(notification.getContactDate());
-            contactTimeElapsed.setText(notification.getTimeElapsed());
-            contactVaccineStatus.setText(notification.getContactVaccineStatus());
-        }
-    }
-
-    public class NotificationAdapter extends RecyclerView.Adapter<NotificationViewHolder> {
-        private List<ContactHistoryNotification> notifications;
-
-        public NotificationAdapter(List<ContactHistoryNotification> notifications) {
-            this.notifications = notifications;
-        }
-
-        @NonNull
-        @Override
-        public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_item, parent, false);
-            return new NotificationViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
-            holder.bind(notifications.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return notifications.size();
-        }
-    }
 }
 
