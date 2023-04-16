@@ -38,5 +38,5 @@
         android:layout_gravity="center"
         android:layout_centerInParent="true"
         android:layout_below="@id/choose_doc_img_preview"
-        android:visibility="visible" />
+        android:visibility="gone" />
 </RelativeLayout>
