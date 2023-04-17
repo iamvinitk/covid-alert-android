@@ -2,8 +2,11 @@ package com.example.covidalert;
 
 import static com.example.covidalert.Constants.BASE_URL;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -89,21 +92,59 @@ public class VaccineEdit extends AppCompatActivity {
             String updatedSecondDoseManufacturer = secondDoseManufacturerEditText.getText().toString();
             String updatedOtherDoseManufacturer = otherDoseManufacturerEditText.getText().toString();
 
-            SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
-            editor.putBoolean("vaccineUploaded", true);
-            editor.putString("vaccine_first_name", updatedFirstName);
-            editor.putString("vaccine_last_name", updatedLastName);
-            editor.putString("vaccine_dob", updatedDob);
-            editor.putString("vaccine_first_dose_date", updatedFirstDoseDate);
-            editor.putString("vaccine_first_dose_manufacture", updatedFirstDoseManufacturer);
-            editor.putString("vaccine_second_dose_date", updatedSecondDoseDate);
-            editor.putString("vaccine_second_dose_manufacture", updatedSecondDoseManufacturer);
-            editor.putString("vaccine_other_dose_date", updatedOtherDoseDate);
-            editor.putString("vaccine_other_dose_manufacture", updatedOtherDoseManufacturer);
-            editor.apply();
+            SharedPreferences sharedPreferences = Objects.requireNonNull(this).getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            boolean licenseUploaded = sharedPreferences.getBoolean("dlUploaded", false);
+            String dl_name = sharedPreferences.getString("dl_name", "").toString();
+            String dl_dob = sharedPreferences.getString("dl_dob", "").toString();
 
-            DriverDetails driverDetails = new DriverDetails(updatedFirstName, updatedLastName, updatedDob, "", updatedFirstDoseDate, updatedFirstDoseManufacturer, updatedSecondDoseDate, updatedSecondDoseManufacturer, updatedOtherDoseDate, updatedOtherDoseManufacturer);
-            executorService.execute(postVaccine(driverDetails));
+            if(licenseUploaded && dl_name != "" && dl_dob != ""){
+                String[] arrname=  dl_name.split(" ");
+                if(arrname.length>0){
+                    String fname = arrname[0].trim().toLowerCase();
+                    String lname = arrname[arrname.length-1].trim().toLowerCase();
+                    if(!updatedFirstName.equalsIgnoreCase(fname) || !updatedLastName.equalsIgnoreCase(lname) || !updatedDob.equalsIgnoreCase(dl_dob)){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(VaccineEdit.this);
+                        builder.setMessage("Vaccine Personal information do not match with License Details. Please Re-enter details correctly");
+                        builder.setTitle("Alert!");
+                        builder.setPositiveButton("OK", (DialogInterface.OnClickListener) (dialog, which) -> {
+                            // When the user click yes button then app will close
+                            dialog.cancel();
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                    else {
+                        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+                        editor.putBoolean("vaccineUploaded", true);
+                        editor.putString("vaccine_first_name", updatedFirstName);
+                        editor.putString("vaccine_last_name", updatedLastName);
+                        editor.putString("vaccine_dob", updatedDob);
+                        editor.putString("vaccine_first_dose_date", updatedFirstDoseDate);
+                        editor.putString("vaccine_first_dose_manufacture", updatedFirstDoseManufacturer);
+                        editor.putString("vaccine_second_dose_date", updatedSecondDoseDate);
+                        editor.putString("vaccine_second_dose_manufacture", updatedSecondDoseManufacturer);
+                        editor.putString("vaccine_other_dose_date", updatedOtherDoseDate);
+                        editor.putString("vaccine_other_dose_manufacture", updatedOtherDoseManufacturer);
+                        editor.apply();
+
+                        DriverDetails driverDetails = new DriverDetails(updatedFirstName, updatedLastName, updatedDob, "", updatedFirstDoseDate, updatedFirstDoseManufacturer, updatedSecondDoseDate, updatedSecondDoseManufacturer, updatedOtherDoseDate, updatedOtherDoseManufacturer);
+                        executorService.execute(postVaccine(driverDetails));
+                    }
+                }
+
+            }
+            else{
+                AlertDialog.Builder builder = new AlertDialog.Builder(VaccineEdit.this);
+                builder.setMessage("Driver License Details do not exists!");
+                builder.setTitle("Alert!");
+                builder.setCancelable(false);
+                builder.setPositiveButton("OK", (DialogInterface.OnClickListener) (dialog, which) -> {
+                    // When the user click yes button then app will close
+                    dialog.cancel();
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
         });
     }
 
