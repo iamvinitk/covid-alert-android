@@ -175,13 +175,17 @@ public class HomeFragment extends Fragment {
                 Map<String, Integer> vaccineStatus = entry.getValue();
                 System.out.println("Date: " + date);
                 for (Map.Entry<String, Integer> status : vaccineStatus.entrySet()) {
-                    if (status.getKey().equals("PARTIALLY VACCINATED"))
+                    if (status.getKey().equals("PARTIALLY VACCINATED")) {
                         partiallyVaccinated.add(new BarEntry(i, status.getValue()));
-                    else if (status.getKey().equals("NOT VACCINATED"))
+                        i++;
+                        dates.add(date);
+                    }
+                    else if (status.getKey().equals("NOT VACCINATED")) {
                         notVaccinated.add(new BarEntry(i, status.getValue()));
+                        i++;
+                        dates.add(date);
+                    }
                     System.out.println("Vaccine Status: " + status.getKey() + ", Count: " + status.getValue());
-                    dates.add(date);
-                    i++;
                 }
             }
         } catch (Exception e) {
@@ -226,21 +230,23 @@ public class HomeFragment extends Fragment {
         // Set up the x-axis
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f);
+        xAxis.setXOffset(20f);
+        xAxis.setGranularity(2f);
+        xAxis.setLabelRotationAngle(-45f);
         xAxis.setDrawGridLines(false);
         xAxis.setValueFormatter(new IndexAxisValueFormatter(dates));
 
         // Set up the y-axis
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setAxisMinimum(0f);
-        leftAxis.setGranularity(1f);
+        leftAxis.setGranularity(2f);
         leftAxis.setDrawGridLines(false);
         leftAxis.setDrawAxisLine(false);
         barChart.getAxisRight().setEnabled(false);
 
         // Set the bar width and group spacing
-        float groupSpace = 0.3f;
-        float barSpace = 0.35f;
+        float groupSpace = 0.75f;
+        float barSpace = 0.3f;
         float barWidth = 0.25f;
         barData.setBarWidth(barWidth);
 

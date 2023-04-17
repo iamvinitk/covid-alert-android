@@ -7,8 +7,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseSettings;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -73,8 +75,8 @@ public class BeaconService extends Service implements BeaconConsumer {
 
         createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Bluetooth Service")
                 .setContentText("Scanning for users...")
@@ -82,7 +84,7 @@ public class BeaconService extends Service implements BeaconConsumer {
                 .setContentIntent(pendingIntent)
                 .build();
 
-        startForeground(1, notification);
+        startForeground(2, notification);
         Runnable advertisingIdRunnable = getAdvertisingId();
         executorService.execute(advertisingIdRunnable);
 
@@ -100,6 +102,7 @@ public class BeaconService extends Service implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
+
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
@@ -144,21 +147,31 @@ public class BeaconService extends Service implements BeaconConsumer {
 
                                         String message = String.format("Contacted with %s person on %s", contactInfo.get("contactVaccineStatus"), contactInfo.get("contactDate").toString().substring(0, 10));
                                         CharSequence name = "Covid Contact Alert";
-                                        String description = message;
-                                        int importance = NotificationManager.IMPORTANCE_DEFAULT;
-                                        NotificationChannel channel = new NotificationChannel("CovidAlertChannel", name, importance);
-                                        channel.setDescription(description);
-                                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                                        notificationManager.createNotificationChannel(channel);
 
-                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                                                .setSmallIcon(android.R.drawable.ic_dialog_info)
-                                                .setContentTitle("Covid Contact Alert")
-                                                .setContentText(message)
-                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                                .setAutoCancel(true);
+                                        Intent deviceFoundIntent = new Intent(MainActivity.ACTION_DEVICE_FOUND);
+                                        deviceFoundIntent.putExtra(MainActivity.EXTRA_DEVICE_INFO, message);
+                                        sendBroadcast(deviceFoundIntent);
 
-                                        notificationManager.notify(1, builder.build());
+//                                        String description = message;
+//                                        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+//                                        NotificationChannel channel = new NotificationChannel("CovidAlertChannel", name, importance);
+//                                        channel.setDescription(description);
+//                                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+//                                        notificationManager.createNotificationChannel(channel);
+//
+//
+//                                        Intent intent = new Intent(getApplicationContext(), NotificationListActivity.class);
+//                                        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+//
+//                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+//                                                .setSmallIcon(android.R.drawable.ic_dialog_info)
+//                                                .setContentTitle("Covid Contact Alert")
+//                                                .setContentText(message)
+//                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                                                .setContentIntent(pendingIntent)
+//                                                .setAutoCancel(true);
+//
+//                                        notificationManager.notify(1, builder.build());
                                     }
                                 }, error -> Log.d("ERROR", "")) {
                                     @Override
@@ -258,7 +271,7 @@ public class BeaconService extends Service implements BeaconConsumer {
 
                             @Override
                             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-                                Log.i("TAG", "Advertisement start succeeded.");
+                                System.out.println("message: " + "message");
                             }
                         });
                     }
@@ -266,5 +279,4 @@ public class BeaconService extends Service implements BeaconConsumer {
             }
         };
     }
-
 }
