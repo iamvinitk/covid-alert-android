@@ -13,6 +13,8 @@ import androidx.core.content.FileProvider;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -65,6 +67,10 @@ public class ChooseDocument extends AppCompatActivity {
     private ProgressBar progressBar;
     private Button btn;
     private String advertisingId = "";
+    private String fname ="";
+    private String lname ="";
+    private String dateOfBirth="";
+    private Boolean alertFlag=true;
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -199,6 +205,9 @@ public class ChooseDocument extends AppCompatActivity {
                 }.getType());
 
                 if (Objects.equals(docUploadType, "dl")) {
+                    fname = driverDetails.givenName;
+                    lname = driverDetails.familyName;
+                    dateOfBirth = driverDetails.dateOfBirth;
                     String name = driverDetails.givenName + " " + driverDetails.familyName;
                     String dob = driverDetails.dateOfBirth;
                     String data = "Name: " + name + "\n" + "Date of Birth: " + dob;
@@ -254,16 +263,22 @@ public class ChooseDocument extends AppCompatActivity {
         builder.setTitle("Are the details correct?");
         builder.setCancelable(false);
         builder.setPositiveButton("Yes", (dialog, which) -> {
-            saveAndUploadDate(docUploadType, driverDetails);
-            if (docUploadType.equals("vaccine")) {
-                setResult(Activity.RESULT_OK);
-                finish();
-            } else {
-                setResult(Activity.RESULT_OK);
-                finish();
-                Intent i = new Intent(this, ChooseDocument.class);
-                i.putExtra("documentType", "vaccine_certificate");
-                startActivity(i);
+
+            saveAndUploadDate(docUploadType, driverDetails, dialog);
+            if(alertFlag) {
+
+
+                if (docUploadType.equals("vaccine")) {
+
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                } else {
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                    Intent i = new Intent(this, ChooseDocument.class);
+                    i.putExtra("documentType", "vaccine_certificate");
+                    startActivity(i);
+                }
             }
         });
 
@@ -298,7 +313,7 @@ public class ChooseDocument extends AppCompatActivity {
         alertDialog.show();
     }
 
-    public void saveAndUploadDate(String docUploadTypeTemp, DriverDetails driverDetails) {
+    public void saveAndUploadDate(String docUploadTypeTemp, DriverDetails driverDetails, DialogInterface maindialog) {
         if (docUploadTypeTemp.equals("dl")) {
             SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
             editor.putBoolean("dlUploaded", true);
@@ -312,21 +327,53 @@ public class ChooseDocument extends AppCompatActivity {
             executorService.execute(advertisingIdRunnable);
 
         } else if (docUploadTypeTemp.equals("vaccine")) {
-            SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
-            editor.putBoolean("vaccineUploaded", true);
-            editor.putString("vaccine_first_name", driverDetails.givenName);
-            editor.putString("vaccine_last_name", driverDetails.familyName);
-            editor.putString("vaccine_dob", driverDetails.dateOfBirth);
-            editor.putString("vaccine_first_dose_date", driverDetails.firstDoseDate);
-            editor.putString("vaccine_first_dose_manufacture", driverDetails.firstDoseManufacturer);
-            editor.putString("vaccine_second_dose_date", driverDetails.secondDoseDate);
-            editor.putString("vaccine_second_dose_manufacture", driverDetails.secondDoseManufacturer);
-            editor.putString("vaccine_other_dose_date", driverDetails.otherDoseDate);
-            editor.putString("vaccine_other_dose_manufacture", driverDetails.otherDoseManufacturer);
-            editor.apply();
+            SharedPreferences sharedPreferences = Objects.requireNonNull(this).getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            boolean licenseUploaded = sharedPreferences.getBoolean("dlUploaded", false);
+            String dl_name = sharedPreferences.getString("dl_name", "");
+            String dl_dob = sharedPreferences.getString("dl_dob", "");
 
-            Runnable advertisingIdRunnable = postVaccine(driverDetails);
-            executorService.execute(advertisingIdRunnable);
+            if(licenseUploaded && dl_name!="" && dl_dob!=""){
+                String[] arrname = dl_name.split(" ");
+                if(arrname.length>0){
+                    String fname = arrname[0].trim().toLowerCase();
+                    String lname = arrname[arrname.length-1].trim().toLowerCase();
+                    if(!driverDetails.givenName.equalsIgnoreCase(fname) || !driverDetails.familyName.equalsIgnoreCase(lname) || !driverDetails.dateOfBirth.equalsIgnoreCase(dl_dob)){
+                        maindialog.cancel();
+                        alertFlag = false;
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDocument.this);
+                        builder.setMessage("Vaccine Personal information do not match with License Details. Please Re-scan and upload vaccine card..");
+                        builder.setTitle("Alert!");
+                        builder.setPositiveButton("OK", (DialogInterface.OnClickListener) (dialog, which) -> {
+                            btn.setText("Upload Vaccine");
+                            isImageCaptured = false;
+
+                            progressBar.setVisibility(ProgressBar.GONE);
+                            // When the user click yes button then app will close
+                            dialog.cancel();
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                    else{
+                        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+                        editor.putBoolean("vaccineUploaded", true);
+                        editor.putString("vaccine_first_name", driverDetails.givenName);
+                        editor.putString("vaccine_last_name", driverDetails.familyName);
+                        editor.putString("vaccine_dob", driverDetails.dateOfBirth);
+                        editor.putString("vaccine_first_dose_date", driverDetails.firstDoseDate);
+                        editor.putString("vaccine_first_dose_manufacture", driverDetails.firstDoseManufacturer);
+                        editor.putString("vaccine_second_dose_date", driverDetails.secondDoseDate);
+                        editor.putString("vaccine_second_dose_manufacture", driverDetails.secondDoseManufacturer);
+                        editor.putString("vaccine_other_dose_date", driverDetails.otherDoseDate);
+                        editor.putString("vaccine_other_dose_manufacture", driverDetails.otherDoseManufacturer);
+                        editor.apply();
+
+                        Runnable advertisingIdRunnable = postVaccine(driverDetails);
+                        executorService.execute(advertisingIdRunnable);
+                    }
+                }
+            }
+
         }
     }
 
