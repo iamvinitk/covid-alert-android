@@ -105,7 +105,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="No new notifications"
+                android:text="No contact history found"
                 android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
