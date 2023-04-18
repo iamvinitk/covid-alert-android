@@ -25,6 +25,7 @@ import android.util.Log;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -126,12 +127,10 @@ public class BeaconService extends Service implements BeaconConsumer {
 
 
                                 JSONObject jsonBody = new JSONObject();
-                                LocalDate currentDate = LocalDate.now();
-                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                                String formattedDate = currentDate.format(formatter);
+                                LocalDateTime currentDate = LocalDateTime.now();
                                 jsonBody.put("userId", advertisingId);
                                 jsonBody.put("licenseNumber", licenceNumber);
-                                jsonBody.put("contactDate", formattedDate);
+                                jsonBody.put("contactDate", currentDate.toString());
                                 jsonBody.put("contactDeviceId", contactDeviceId);
 
                                 String requestBody = jsonBody.toString();
@@ -151,27 +150,6 @@ public class BeaconService extends Service implements BeaconConsumer {
                                         Intent deviceFoundIntent = new Intent(MainActivity.ACTION_DEVICE_FOUND);
                                         deviceFoundIntent.putExtra(MainActivity.EXTRA_DEVICE_INFO, message);
                                         sendBroadcast(deviceFoundIntent);
-
-//                                        String description = message;
-//                                        int importance = NotificationManager.IMPORTANCE_DEFAULT;
-//                                        NotificationChannel channel = new NotificationChannel("CovidAlertChannel", name, importance);
-//                                        channel.setDescription(description);
-//                                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-//                                        notificationManager.createNotificationChannel(channel);
-//
-//
-//                                        Intent intent = new Intent(getApplicationContext(), NotificationListActivity.class);
-//                                        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-//
-//                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-//                                                .setSmallIcon(android.R.drawable.ic_dialog_info)
-//                                                .setContentTitle("Covid Contact Alert")
-//                                                .setContentText(message)
-//                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                                                .setContentIntent(pendingIntent)
-//                                                .setAutoCancel(true);
-//
-//                                        notificationManager.notify(1, builder.build());
                                     }
                                 }, error -> Log.d("ERROR", "")) {
                                     @Override
@@ -190,8 +168,6 @@ public class BeaconService extends Service implements BeaconConsumer {
                                         return super.parseNetworkResponse(networkResponse);
                                     }
                                 };
-
-//                            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
                                 requestQueue.add(stringRequest);
                             } catch (Exception e) {
