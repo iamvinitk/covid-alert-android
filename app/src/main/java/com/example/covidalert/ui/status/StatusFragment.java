@@ -138,6 +138,10 @@ public class StatusFragment extends Fragment {
             dateOther.setVisibility(View.GONE);
         }
 
+        if (licenseUploaded) {
+            statusVaccinationCard.setVisibility(View.VISIBLE);
+        }
+
         if (vaccineUploaded && licenseUploaded) {
             uploadButton.setText("Documents Uploaded");
         } else if (licenseUploaded) {

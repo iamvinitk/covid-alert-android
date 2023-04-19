@@ -97,12 +97,12 @@ public class VaccineEdit extends AppCompatActivity {
             String dl_name = sharedPreferences.getString("dl_name", "").toString();
             String dl_dob = sharedPreferences.getString("dl_dob", "").toString();
 
-            if(licenseUploaded && dl_name != "" && dl_dob != ""){
-                String[] arrname=  dl_name.split(" ");
-                if(arrname.length>0){
+            if (licenseUploaded && !dl_name.equals("") && !dl_dob.equals("")) {
+                String[] arrname = dl_name.split(" ");
+                if (arrname.length > 0) {
                     String fname = arrname[0].trim().toLowerCase();
-                    String lname = arrname[arrname.length-1].trim().toLowerCase();
-                    if(!updatedFirstName.equalsIgnoreCase(fname) || !updatedLastName.equalsIgnoreCase(lname) || !updatedDob.equalsIgnoreCase(dl_dob)){
+                    String lname = arrname[arrname.length - 1].trim().toLowerCase();
+                    if (!updatedFirstName.equalsIgnoreCase(fname) || !updatedLastName.equalsIgnoreCase(lname) || !updatedDob.equalsIgnoreCase(dl_dob)) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(VaccineEdit.this);
                         builder.setMessage("Vaccine Personal information do not match with License Details. Please Re-enter details correctly");
                         builder.setTitle("Alert!");
@@ -112,8 +112,7 @@ public class VaccineEdit extends AppCompatActivity {
                         });
                         AlertDialog alertDialog = builder.create();
                         alertDialog.show();
-                    }
-                    else {
+                    } else {
                         SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
                         editor.putBoolean("vaccineUploaded", true);
                         editor.putString("vaccine_first_name", updatedFirstName);
@@ -132,8 +131,7 @@ public class VaccineEdit extends AppCompatActivity {
                     }
                 }
 
-            }
-            else{
+            } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(VaccineEdit.this);
                 builder.setMessage("Driver License Details do not exists!");
                 builder.setTitle("Alert!");
@@ -152,8 +150,6 @@ public class VaccineEdit extends AppCompatActivity {
         // Show Toast
         Toast.makeText(this, "Vaccine information saved", Toast.LENGTH_SHORT).show();
         finish();
-//        Intent intent = new Intent(this, MainActivity.class);
-//        startActivity(intent);
     }
 
     private Runnable postVaccine(DriverDetails driverDetails) {

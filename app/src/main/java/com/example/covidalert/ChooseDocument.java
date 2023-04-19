@@ -67,10 +67,10 @@ public class ChooseDocument extends AppCompatActivity {
     private ProgressBar progressBar;
     private Button btn;
     private String advertisingId = "";
-    private String fname ="";
-    private String lname ="";
-    private String dateOfBirth="";
-    private Boolean alertFlag=true;
+    private String fname = "";
+    private String lname = "";
+    private String dateOfBirth = "";
+    private Boolean alertFlag = true;
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -265,11 +265,8 @@ public class ChooseDocument extends AppCompatActivity {
         builder.setPositiveButton("Yes", (dialog, which) -> {
 
             saveAndUploadDate(docUploadType, driverDetails, dialog);
-            if(alertFlag) {
-
-
+            if (alertFlag) {
                 if (docUploadType.equals("vaccine")) {
-
                     setResult(Activity.RESULT_OK);
                     finish();
                 } else {
@@ -321,8 +318,6 @@ public class ChooseDocument extends AppCompatActivity {
             editor.putString("dl_dob", driverDetails.dateOfBirth);
             editor.putString("dl_number", driverDetails.licenseNumber);
             editor.apply();
-
-
             Runnable advertisingIdRunnable = postLicence(driverDetails);
             executorService.execute(advertisingIdRunnable);
 
@@ -332,12 +327,12 @@ public class ChooseDocument extends AppCompatActivity {
             String dl_name = sharedPreferences.getString("dl_name", "");
             String dl_dob = sharedPreferences.getString("dl_dob", "");
 
-            if(licenseUploaded && !dl_name.equals("") && !dl_dob.equals("")){
+            if (licenseUploaded && !dl_name.equals("") && !dl_dob.equals("")) {
                 String[] arrname = dl_name.split(" ");
-                if(arrname.length>0){
+                if (arrname.length > 0) {
                     String fname = arrname[0].trim().toLowerCase();
-                    String lname = arrname[arrname.length-1].trim().toLowerCase();
-                    if(!driverDetails.givenName.equalsIgnoreCase(fname) || !driverDetails.familyName.equalsIgnoreCase(lname) || !driverDetails.dateOfBirth.equalsIgnoreCase(dl_dob)){
+                    String lname = arrname[arrname.length - 1].trim().toLowerCase();
+                    if (!driverDetails.givenName.equalsIgnoreCase(fname) || !driverDetails.familyName.equalsIgnoreCase(lname) || !driverDetails.dateOfBirth.equalsIgnoreCase(dl_dob)) {
                         maindialog.cancel();
                         alertFlag = false;
                         AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDocument.this);
@@ -353,8 +348,7 @@ public class ChooseDocument extends AppCompatActivity {
                         });
                         AlertDialog alertDialog = builder.create();
                         alertDialog.show();
-                    }
-                    else{
+                    } else {
                         SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
                         editor.putBoolean("vaccineUploaded", true);
                         editor.putString("vaccine_first_name", driverDetails.givenName);
