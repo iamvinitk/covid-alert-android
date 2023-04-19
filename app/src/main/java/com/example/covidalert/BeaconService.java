@@ -143,10 +143,34 @@ public class BeaconService extends Service implements BeaconConsumer {
 
                                         String message = String.format("Contacted with %s person on %s", contactInfo.get("contactVaccineStatus"), contactInfo.get("contactDate").toString().substring(0, 10));
                                         CharSequence name = "Covid Contact Alert";
+                                        String description = message;
+                                        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                                        NotificationChannel channel = new NotificationChannel("CovidAlertChannel", name, importance);
+                                        channel.setDescription(description);
+                                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                                        notificationManager.createNotificationChannel(channel);
 
-                                        Intent deviceFoundIntent = new Intent(MainActivity.ACTION_DEVICE_FOUND);
-                                        deviceFoundIntent.putExtra(MainActivity.EXTRA_DEVICE_INFO, message);
-                                        sendBroadcast(deviceFoundIntent);
+//                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+//                                                .setSmallIcon(android.R.drawable.ic_dialog_info)
+//                                                .setContentTitle("Covid Contact Alert")
+//                                                .setContentText(message)
+//                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                                                .setAutoCancel(true);
+
+//                                        notificationManager.notify(2, builder.build());
+
+//                                        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intentNotification, PendingIntent.FLAG_IMMUTABLE);
+
+                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "CHANNEL_ID")
+                                                .setSmallIcon(R.drawable.ic_launcher_background)
+                                                .setContentTitle("Covid Contact Alert")
+                                                .setContentText(message)
+                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                                // Set the intent that will fire when the user taps the notification
+//                                                .setContentIntent(pendingIntent)
+                                                .setAutoCancel(true);
+
+                                        notificationManager.notify(1, builder.build());
                                     }
                                 }, error -> Log.d("ERROR", "")) {
                                     @Override
@@ -244,6 +268,20 @@ public class BeaconService extends Service implements BeaconConsumer {
 
                             @Override
                             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+//                                NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "CHANNEL_ID")
+//                                        .setSmallIcon(R.drawable.ic_launcher_background)
+//                                        .setContentTitle("Covid Contact Alert")
+//                                        .setContentText("message")
+//                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                                        // Set the intent that will fire when the user taps the notification
+////                                                .setContentIntent(pendingIntent)
+//                                        .setAutoCancel(true);
+//                                NotificationChannel channel = new NotificationChannel("CovidAlertChannel", "name", NotificationManager.IMPORTANCE_DEFAULT);
+//                                channel.setDescription("description");
+//
+//                                NotificationManager notificationManager = getSystemService(NotificationManager.class);
+//                                notificationManager.createNotificationChannel(channel);
+//                                notificationManager.notify(1, builder.build());
                                 Log.i("TAG", "Advertisement start succeeded.");
                             }
                         });

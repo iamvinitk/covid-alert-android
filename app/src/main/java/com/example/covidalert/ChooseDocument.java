@@ -354,7 +354,7 @@ public class ChooseDocument extends AppCompatActivity {
             String dl_name = sharedPreferences.getString("dl_name", "");
             String dl_dob = sharedPreferences.getString("dl_dob", "");
 
-            if(licenseUploaded && dl_name!="" && dl_dob!=""){
+            if(licenseUploaded && !dl_name.equals("") && !dl_dob.equals("")){
                 String[] arrname = dl_name.split(" ");
                 if(arrname.length>0){
                     String fname = arrname[0].trim().toLowerCase();
