@@ -129,6 +129,10 @@ public class LicenceEdit extends AppCompatActivity {
                                 Log.d("RESPONSE", "response => " + response);
                                 runOnUiThread(() -> {
                                     Toast.makeText(getApplicationContext(), "Licence uploaded successfully", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    Intent i = new Intent(getApplicationContext(), ChooseDocument.class);
+                                    i.putExtra("documentType", "vaccine_certificate");
+                                    startActivity(i);
                                 });
                             }, error -> {
                                 Log.d("ERROR", "error => " + error.toString());
