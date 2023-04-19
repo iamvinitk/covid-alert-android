@@ -29,6 +29,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -51,6 +52,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -210,8 +212,28 @@ public class ChooseDocument extends AppCompatActivity {
                     dateOfBirth = driverDetails.dateOfBirth;
                     String name = driverDetails.givenName + " " + driverDetails.familyName;
                     String dob = driverDetails.dateOfBirth;
-                    String data = "Name: " + name + "\n" + "Date of Birth: " + dob;
-                    runOnUiThread(() -> showAlert(data, driverDetails));
+                    ;
+                    LocalDate expdt = LocalDate.parse(driverDetails.expirationDate);
+                    if(expdt.isBefore(LocalDate.now()))
+                    {
+                        System.out.println("ExpDT:"+expdt);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDocument.this);
+                        builder.setMessage("Scanned licence is not valid. Please scan a valid licence.");
+                        builder.setTitle("Alert!");
+                        builder.setPositiveButton("OK", (DialogInterface.OnClickListener) (dialog, which) -> {
+                            // When the user click yes button then app will close
+                            btn.setText("Upload Licence");
+                            isImageCaptured = false;
+                            progressBar.setVisibility(ProgressBar.GONE);
+                            dialog.cancel();
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                    else {
+                        String data = "Name: " + name + "\n" + "Date of Birth: " + dob;
+                        runOnUiThread(() -> showAlert(data, driverDetails));
+                    }
                 }
 
                 if (Objects.equals(docUploadType, "vaccine")) {
@@ -346,7 +368,6 @@ public class ChooseDocument extends AppCompatActivity {
                         builder.setPositiveButton("OK", (DialogInterface.OnClickListener) (dialog, which) -> {
                             btn.setText("Upload Vaccine");
                             isImageCaptured = false;
-
                             progressBar.setVisibility(ProgressBar.GONE);
                             // When the user click yes button then app will close
                             dialog.cancel();
