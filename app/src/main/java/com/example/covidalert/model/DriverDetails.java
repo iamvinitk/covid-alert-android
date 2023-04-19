@@ -4,6 +4,8 @@ public class DriverDetails {
     public String givenName;
     public String familyName;
     public String dateOfBirth;
+
+    public String expirationDate;
     public String licenseNumber;
     public String firstDoseDate;
     public String firstDoseManufacturer;
