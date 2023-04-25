@@ -195,7 +195,6 @@ public class ChooseDocument extends AppCompatActivity {
             String url = BASE_URL + "/vision";
 
             String base64Str = convertImageToBase64(photo);
-//            System.out.println("====>>> data:image/jpeg;base64," + base64Str);
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("image", "data:image/jpeg;base64," + base64Str);
             jsonBody.put("type", docUploadType);
@@ -212,11 +211,10 @@ public class ChooseDocument extends AppCompatActivity {
                     dateOfBirth = driverDetails.dateOfBirth;
                     String name = driverDetails.givenName + " " + driverDetails.familyName;
                     String dob = driverDetails.dateOfBirth;
-                    ;
+
                     LocalDate expdt = LocalDate.parse(driverDetails.expirationDate);
-                    if(expdt.isBefore(LocalDate.now()))
-                    {
-                        System.out.println("ExpDT:"+expdt);
+                    if (expdt.isBefore(LocalDate.now())) {
+                        System.out.println("ExpDT:" + expdt);
                         AlertDialog.Builder builder = new AlertDialog.Builder(ChooseDocument.this);
                         builder.setMessage("Scanned licence is not valid. Please scan a valid licence.");
                         builder.setTitle("Alert!");
@@ -229,8 +227,7 @@ public class ChooseDocument extends AppCompatActivity {
                         });
                         AlertDialog alertDialog = builder.create();
                         alertDialog.show();
-                    }
-                    else {
+                    } else {
                         String data = "Name: " + name + "\n" + "Date of Birth: " + dob;
                         runOnUiThread(() -> showAlert(data, driverDetails));
                     }
@@ -274,7 +271,6 @@ public class ChooseDocument extends AppCompatActivity {
     private String convertImageToBase64(Bitmap photo) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         photo.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
-
         return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
     }
 
@@ -339,6 +335,19 @@ public class ChooseDocument extends AppCompatActivity {
             editor.putString("dl_name", driverDetails.givenName + " " + driverDetails.familyName);
             editor.putString("dl_dob", driverDetails.dateOfBirth);
             editor.putString("dl_number", driverDetails.licenseNumber);
+
+            // Vaccine
+            editor.putBoolean("vaccineUploaded", false);
+            editor.putString("vaccine_first_name", "");
+            editor.putString("vaccine_last_name", "");
+            editor.putString("vaccine_dob", "");
+            editor.putString("vaccine_first_dose_date", "");
+            editor.putString("vaccine_first_dose_manufacture", "");
+            editor.putString("vaccine_second_dose_date", "");
+            editor.putString("vaccine_second_dose_manufacture", "");
+            editor.putString("vaccine_other_dose_date", "");
+            editor.putString("vaccine_other_dose_manufacture", "");
+
             editor.apply();
             Runnable advertisingIdRunnable = postLicence(driverDetails);
             executorService.execute(advertisingIdRunnable);
@@ -418,11 +427,10 @@ public class ChooseDocument extends AppCompatActivity {
                     @Override
                     public void run() {
                         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-
                         String url = BASE_URL + "/vaccine";
+                        JSONObject jsonBody = new JSONObject();
 
                         try {
-                            JSONObject jsonBody = new JSONObject();
                             jsonBody.put("userId", finalAdvertisingId);
                             jsonBody.put("givenName", driverDetails.givenName);
                             jsonBody.put("familyName", driverDetails.familyName);
@@ -433,37 +441,38 @@ public class ChooseDocument extends AppCompatActivity {
                             jsonBody.put("secondDoseManufacturer", driverDetails.secondDoseManufacturer);
                             jsonBody.put("otherDoseDate", driverDetails.otherDoseDate);
                             jsonBody.put("otherDoseManufacturer", driverDetails.otherDoseManufacturer);
-
-                            String requestBody = jsonBody.toString();
-
-                            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
-                                Log.d("RESPONSE", "response => " + response);
-                                runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "Vaccine uploaded successfully", Toast.LENGTH_SHORT).show();
-                                });
-                            }, error -> {
-                                Log.d("ERROR", "error => " + error.toString());
-                                runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "Vaccine upload failed. Try again", Toast.LENGTH_SHORT).show();
-                                });
-                            }) {
-                                @Override
-                                public String getBodyContentType() {
-                                    return "application/json; charset=utf-8";
-                                }
-
-                                @Override
-                                public byte[] getBody() {
-                                    return requestBody.getBytes(StandardCharsets.UTF_8);
-                                }
-                            };
-
-                            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-                            requestQueue.add(stringRequest);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
+                        String requestBody = jsonBody.toString();
+
+                        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
+                            Log.d("RESPONSE", "response => " + response);
+                            runOnUiThread(() -> {
+                                Toast.makeText(getApplicationContext(), "Vaccine uploaded successfully", Toast.LENGTH_SHORT).show();
+                            });
+                        }, error -> {
+                            Log.d("ERROR", "error => " + error.toString());
+                            runOnUiThread(() -> {
+                                Toast.makeText(getApplicationContext(), "Vaccine upload failed. Try again", Toast.LENGTH_SHORT).show();
+                            });
+                        }) {
+                            @Override
+                            public String getBodyContentType() {
+                                return "application/json; charset=utf-8";
+                            }
+
+                            @Override
+                            public byte[] getBody() {
+                                return requestBody.getBytes(StandardCharsets.UTF_8);
+                            }
+                        };
+
+                        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+                        requestQueue.add(stringRequest);
+
                     }
                 });
             }

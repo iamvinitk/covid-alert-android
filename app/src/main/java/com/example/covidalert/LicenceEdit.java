@@ -70,6 +70,20 @@ public class LicenceEdit extends AppCompatActivity {
             editor.putString("dl_name", updatedName);
             editor.putString("dl_dob", updatedDob);
             editor.putString("dl_number", updatedDlNumber);
+
+
+            // Vaccine
+            editor.putBoolean("vaccineUploaded", false);
+            editor.putString("vaccine_first_name", "");
+            editor.putString("vaccine_last_name", "");
+            editor.putString("vaccine_dob", "");
+            editor.putString("vaccine_first_dose_date", "");
+            editor.putString("vaccine_first_dose_manufacture", "");
+            editor.putString("vaccine_second_dose_date", "");
+            editor.putString("vaccine_second_dose_manufacture", "");
+            editor.putString("vaccine_other_dose_date", "");
+            editor.putString("vaccine_other_dose_manufacture", "");
+
             editor.apply();
 
             DriverDetails driverDetails = new DriverDetails(firstName, lastName, dob, dlNumber, "", "", "", "", "", "");

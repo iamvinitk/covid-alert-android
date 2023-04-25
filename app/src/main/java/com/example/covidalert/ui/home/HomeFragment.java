@@ -193,15 +193,15 @@ public class HomeFragment extends Fragment {
         }
 
         // Set up the bar chart data sets
-        BarDataSet maleDataSet = new BarDataSet(notVaccinated, "Not Vaccinated");
-        maleDataSet.setColor(Color.BLUE);
-        maleDataSet.setValueTextColor(Color.BLACK);
-        BarDataSet femaleDataSet = new BarDataSet(partiallyVaccinated, "Partially Vaccinated");
-        femaleDataSet.setColor(Color.RED);
-        femaleDataSet.setValueTextColor(Color.BLACK);
+        BarDataSet notVaccinatedSet = new BarDataSet(notVaccinated, "Not Vaccinated");
+        notVaccinatedSet.setColor(Color.BLUE);
+        notVaccinatedSet.setValueTextColor(Color.BLACK);
+        BarDataSet partiallyVaccinatedSet = new BarDataSet(partiallyVaccinated, "Partially Vaccinated");
+        partiallyVaccinatedSet.setColor(Color.RED);
+        partiallyVaccinatedSet.setValueTextColor(Color.BLACK);
 
         // Set up the bar chart data
-        BarData barData = new BarData(maleDataSet, femaleDataSet);
+        BarData barData = new BarData(notVaccinatedSet, partiallyVaccinatedSet);
         barData.setValueTextSize(12f);
         barData.setValueFormatter(new ValueFormatter() {
             @Override
@@ -216,7 +216,7 @@ public class HomeFragment extends Fragment {
 
         // Set up the bar chart description
         Description description = new Description();
-        description.setText("Bar Chart Example");
+        description.setText("Bar Chart of Vaccination Status");
         description.setTextSize(16f);
         barChart.setDescription(description);
 
@@ -287,7 +287,6 @@ public class HomeFragment extends Fragment {
                         endDate = Calendar.getInstance();
                         endDate.set(year, month, dayOfMonth);
                         endDateString = year + "-" + (month + 1) + "-" + dayOfMonth;
-//                        updateBarChartData();
                         System.out.println("Start Date: " + startDateString);
                         System.out.println("End Date: " + endDateString);
                         getData(startDateString, endDateString);

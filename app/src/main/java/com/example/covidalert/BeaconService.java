@@ -25,7 +25,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -121,8 +123,6 @@ public class BeaconService extends Service implements BeaconConsumer {
                             RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
                             try {
-
-
                                 JSONObject jsonBody = new JSONObject();
                                 LocalDateTime currentDate = LocalDateTime.now();
                                 jsonBody.put("userId", advertisingId);
@@ -135,40 +135,26 @@ public class BeaconService extends Service implements BeaconConsumer {
                                 StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
                                     if (statusCode[0] == 201) {
                                         // Response Code
-                                        Log.d("RESPONSE CONTACT HISTORY Galaxy", "response => " + response);
+                                        Log.d("RESPONSE CONTACT HISTORY", "response => " + response);
                                         Gson gson = new Gson();
                                         Type type = new TypeToken<Map<String, Object>>() {
                                         }.getType();
                                         Map<String, Object> contactInfo = gson.fromJson(response, type);
 
-                                        if(!contactInfo.get("contactVaccineStatus").equals("FULLY VACCINATED")) {
-                                            String message = String.format("Contacted with %s person on %s", contactInfo.get("contactVaccineStatus"), contactInfo.get("contactDate").toString().substring(0, 10));
+                                        if(!Objects.equals(contactInfo.get("contactVaccineStatus"), "FULLY VACCINATED")) {
+                                            String message = String.format("Contacted with %s person on %s",
+                                                    contactInfo.get("contactVaccineStatus"), Objects.requireNonNull(contactInfo.get("contactDate")).toString().substring(0, 10));
                                             CharSequence name = "Covid Contact Alert";
-                                            String description = message;
                                             int importance = NotificationManager.IMPORTANCE_DEFAULT;
                                             NotificationChannel channel = new NotificationChannel("CovidAlertChannel", name, importance);
-                                            channel.setDescription(description);
+                                            channel.setDescription(message);
                                             NotificationManager notificationManager = getSystemService(NotificationManager.class);
                                             notificationManager.createNotificationChannel(channel);
-
-//                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-//                                                .setSmallIcon(android.R.drawable.ic_dialog_info)
-//                                                .setContentTitle("Covid Contact Alert")
-//                                                .setContentText(message)
-//                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                                                .setAutoCancel(true);
-
-//                                        notificationManager.notify(2, builder.build());
-
-//                                        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intentNotification, PendingIntent.FLAG_IMMUTABLE);
 
                                             NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "CHANNEL_ID")
                                                     .setSmallIcon(R.drawable.ic_launcher_background)
                                                     .setContentTitle("Covid Contact Alert")
                                                     .setContentText(message)
-                                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                                    // Set the intent that will fire when the user taps the notification
-//                                                .setContentIntent(pendingIntent)
                                                     .setAutoCancel(true);
 
                                             notificationManager.notify(1, builder.build());
@@ -245,16 +231,13 @@ public class BeaconService extends Service implements BeaconConsumer {
                 mainThreadHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        // Update the UI with the advertisingId here
-                        System.out.println("Advertising ID: " + finalAdvertisingId);
-                        // Sender Code
                         Beacon beacon = new Beacon.Builder()
                                 .setId1(finalAdvertisingId)
                                 .setId2("1")
                                 .setId3("2")
                                 .setManufacturer(0x0118) // Radius Networks. Change this for other beacon layouts
                                 .setTxPower(-59)
-                                .setDataFields(Arrays.asList(new Long[]{0l})) // Remove this for beacon layouts without d: fields
+                                .setDataFields(Collections.singletonList(0L)) // Remove this for beacon layouts without d: fields
                                 .build();
 
                         BeaconParser beaconParser = new BeaconParser()
@@ -270,20 +253,6 @@ public class BeaconService extends Service implements BeaconConsumer {
 
                             @Override
                             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-//                                NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "CHANNEL_ID")
-//                                        .setSmallIcon(R.drawable.ic_launcher_background)
-//                                        .setContentTitle("Covid Contact Alert")
-//                                        .setContentText("message")
-//                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                                        // Set the intent that will fire when the user taps the notification
-////                                                .setContentIntent(pendingIntent)
-//                                        .setAutoCancel(true);
-//                                NotificationChannel channel = new NotificationChannel("CovidAlertChannel", "name", NotificationManager.IMPORTANCE_DEFAULT);
-//                                channel.setDescription("description");
-//
-//                                NotificationManager notificationManager = getSystemService(NotificationManager.class);
-//                                notificationManager.createNotificationChannel(channel);
-//                                notificationManager.notify(1, builder.build());
                                 Log.i("TAG", "Advertisement start succeeded.");
                             }
                         });

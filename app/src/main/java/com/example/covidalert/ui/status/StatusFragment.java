@@ -95,6 +95,7 @@ public class StatusFragment extends Fragment {
         // If the user has already uploaded a document, show the document details
 
         SharedPreferences sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
         boolean licenseUploaded = sharedPreferences.getBoolean("dlUploaded", false);
         boolean vaccineUploaded = sharedPreferences.getBoolean("vaccineUploaded", false);
 
